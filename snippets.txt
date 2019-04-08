@@ -1,0 +1,55 @@
+CLI:
+---
+
+cf api
+cf login
+cf target
+cf services
+cf apps
+cf mtas
+
+cf app MTAppBackend (to see routes)
+cf env MTAppBackend (to see VCAP_SERVICES.xsuaa.credentials.xsappname)
+
+cf create-service saas-registry application MTAppRegistry -c registry-config.json
+cf update-service MTAppRegistry -c registry-config.json
+cf bind-service MTAppBackend MTAppRegistry
+cf restage MTAppBackend
+
+cf routes
+cf map-route MTAppRouter cfapps.eu10.hana.ondemand.com --hostname <subdomain>-trial-dev-mtapprouter
+cf delete-route cfapps.eu10.hana.ondemand.com --hostname <subdomain>-trial-dev-mtapprouter -f
+
+
+REST API:
+--------
+
+cf env MTAppBackend (to see VCAP_SERVICES.saas-registry.credentials: url (for auth), saas_registry_url, clientid, clientsecret)
+
+authentication:
+POST /oauth/token?grant_type=client_credentials&response_type=token
+tests: pm.environment.set("token", "Bearer " + JSON.parse(responseBody).access_token);
+
+view app subscribers:
+GET /api/v2.0/subscription
+
+onboarding/subscribe:
+PUT /api/v2.0/subscription/tenants/<subaccountid>?jobUuid=<guid> (content-type: application/json, body: {"subdomain":"<subdomain>"})
+GET /api/v2.0/jobs/<jobid>
+
+offboarding/unsubscribe:
+DELETE /api/v2.0/subscription/tenants/<tenantid>?jobUuid=<guid>
+GET /api/v2.0/jobs/<jobid>
+
+
+Uninstall:
+---------
+
+offboard all tenants first!
+cf services
+cf apps
+cf mtas
+cf service MTAppRegistry
+cf unbind-service MTAppBackend MTAppRegistry
+cf delete-service MTAppRegistry -f
+cf undeploy MTApp --delete-services -f

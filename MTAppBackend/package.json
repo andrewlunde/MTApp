@@ -1,0 +1,20 @@
+{
+	"name": "MTAppBackend",
+	"description": "Multitenant Business App - Backend",
+	"version": "1.0.0",
+	"private": true,
+	"dependencies": {
+		"@sap/xsenv": "latest",
+		"@sap/xssec": "latest",
+		"express": "~4.16.0",
+		"passport": "^0.4.0",
+		"body-parser": "latest"
+	},
+	"main": "server.js",
+	"scripts": {
+		"start": "node server.js"
+	},
+	"engines": {
+		"node": "8.x"
+	}
+}
