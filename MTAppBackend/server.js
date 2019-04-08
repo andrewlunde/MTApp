@@ -39,11 +39,6 @@ app.delete("/callback/v1.0/tenants/*", function (req, res) {
 	res.status(200).send("");
 });
 
-// show dependencies
-app.get("/callback/v1.0/dependencies", function (req, res) {
-	res.status(200).json("[{}]");
-});
-
 var server = require("http").createServer();
 var port = process.env.PORT || 3000;
 

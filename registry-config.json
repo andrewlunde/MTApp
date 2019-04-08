@@ -4,7 +4,6 @@
 	"description": "Multitenant Business App based on Node.js",
 	"category": "Partner Engineering Digital Enablement",
 	"appUrls": {
-		"onSubscription": "https://<subdomain>-trial-dev-mtappbackend.cfapps.eu10.hana.ondemand.com/callback/v1.0/tenants/{tenantId}",
-		"getDependencies": "https://<subdomain>-trial-dev-mtappbackend.cfapps.eu10.hana.ondemand.com/callback/v1.0/dependencies"
+		"onSubscription": "https://<subdomain>-trial-dev-mtappbackend.cfapps.eu10.hana.ondemand.com/callback/v1.0/tenants/{tenantId}"
 	}
 }
