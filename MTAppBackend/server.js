@@ -30,7 +30,7 @@ app.get("/", function (req, res) {
 
 // subscribe/onboard a subscriber tenant
 app.put("/callback/v1.0/tenants/*", function (req, res) {
-	var tenantAppURL = "https:\/\/" + req.body.subscribedSubdomain + "-trial-dev-mtapprouter" + ".cfapps.eu10.hana.ondemand.com";
+	var tenantAppURL = "https:\/\/" + req.body.subscribedSubdomain + "-ar" + ".cfapps.us10.hana.ondemand.com";
 	res.status(200).send(tenantAppURL);
 });
 

@@ -12,8 +12,10 @@ modules:
       properties:
          beurl: ${default-url}
    parameters:
+      app-name: MTAppBackend
       disk-quota: 256M
       memory: 256M
+      host: prov-multi-be
    requires:
       - name: MTAppUAA
    properties:
@@ -29,8 +31,10 @@ modules:
       properties:
          url: ${default-url}
    parameters:
+      app-name: MTAppRouter
       disk-quota: 256M
       memory: 256M
+      host: prov-multi-ar
    requires:
       - name: MTAppUAA
       - name: MTAppBackend_api
@@ -40,7 +44,7 @@ modules:
           url: '~{beurl}'
           forwardAuthToken: true
    properties:
-      TENANT_HOST_PATTERN: "^(.*)-trial-dev-mtapprouter.cfapps.eu10.hana.ondemand.com"
+      TENANT_HOST_PATTERN: "^(.*)-ar.(.*)"
 
 resources:
  - name: MTAppUAA
