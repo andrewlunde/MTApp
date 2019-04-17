@@ -12,7 +12,7 @@
 	},
 	"main": "server.js",
 	"scripts": {
-		"start": "node server.js"
+		"start": "node --inspect server.js"
 	},
 	"engines": {
 		"node": "8.x"
