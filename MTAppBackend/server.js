@@ -5,6 +5,7 @@ var xsenv = require("@sap/xsenv");
 var xssec = require("@sap/xssec");
 var express = require("express");
 var passport = require("passport");
+var stringifyObj = require("stringify-object");
 var bodyParser = require("body-parser");
 
 var app = express();
@@ -22,9 +23,13 @@ app.use(bodyParser.json());
 
 // app functionality
 app.get("/", function (req, res) {
+	var reqStr = stringifyObj(req, {
+    indent: "   ",
+    singleQuotes: false
+});
 	var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp</h1><h2>Welcome " + req.authInfo.userInfo.givenName +
 		" " + req.authInfo.userInfo.familyName + "!</h2><p><b>Subdomain:</b> " + req.authInfo.subdomain + "</p><p><b>Identity Zone:</b> " + req.authInfo
-		.identityZone + "</p></body></html>";
+		.identityZone + "</p>" + "<br /><br /><pre>" + reqStr + "</pre>" + "</body></html>";
 	res.status(200).send(responseStr);
 });
 
