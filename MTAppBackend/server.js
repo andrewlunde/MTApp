@@ -96,11 +96,7 @@ app.get("/get_legal_entity", function (req, res) {
 				}
 			});
 		}
-		return null;
 	});
-	
-	var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
-	res.status(200).send(responseStr);
 });
 
 
