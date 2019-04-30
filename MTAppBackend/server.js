@@ -105,6 +105,63 @@ app.get("/get_legal_entity", function (req, res) {
 	});
 });
 
+app.get("/add_legal_entity", function (req, res) {
+	var reqStr = stringifyObj(req.authInfo.userInfo, {
+		indent: "   ",
+		singleQuotes: false
+	});
+
+	reqStr += "\n\n";
+
+	
+	reqStr += stringifyObj(req.authInfo.scopes, {
+		indent: "   ",
+		singleQuotes: false
+	});
+	
+	var tagStr = "subdomain:" + req.authInfo.subdomain;
+	
+	reqStr += "\nSearching for a bound hana container with tag: " + tagStr + "\n";
+	
+	var services = xsenv.getServices({
+		hana: { tag: tagStr }
+	});
+	
+	var svcsStr = stringifyObj(services, {
+		indent: "   ",
+		singleQuotes: false
+	});
+
+	reqStr += "\n\n";
+
+	reqStr += svcsStr;
+	
+	reqStr += "\n\n";
+
+	//INSERT INTO "LEGAL_ENTITY" VALUES("legalentityId".NEXTVAL, 'Added Entity',1 )"
+	
+	//connect
+	var conn = hdbext.createConnection(services.hana, (err, client) => {
+		if (err) {
+			reqStr += "ERROR: ${err.toString()}";
+			var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
+			return res.status(200).send(responseStr);
+		} else {
+			client.exec('INSERT INTO "LEGAL_ENTITY" VALUES("legalentityId".NEXTVAL, \'Added Entity\',1 )', (err, result) => {
+				if (err) {
+					reqStr += "ERROR: ${err.toString()}";
+					var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
+					return res.status(200).send(responseStr);
+				} else {
+					reqStr += "RESULTSET: \n\n" + stringifyObj(result, {indent: "   ",singleQuotes: false}) +  "\n\n";
+					var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
+					return res.status(200).send(responseStr);
+				}
+			});
+		}
+	});
+});
+
 
 // subscribe/onboard a subscriber tenant
 app.put("/callback/v1.0/tenants/*", function (req, res) {
