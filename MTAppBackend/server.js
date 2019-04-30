@@ -78,7 +78,7 @@ app.get("/get_legal_entity", function (req, res) {
 	//SELECT * FROM "LEGAL_ENTITY"
 	
 	//connect
-	hdbext.createConnection(services.hana, (err, client) => {
+	var conn = hdbext.createConnection(services.hana, (err, client) => {
 		if (err) {
 			reqStr += "ERROR: ${err.toString()}";
 			var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
