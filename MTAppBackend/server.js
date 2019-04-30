@@ -76,20 +76,40 @@ app.get("/get_legal_entity", function (req, res) {
 	reqStr += "\n\n";
 
 	//SELECT * FROM "LEGAL_ENTITY"
-/*
-	var hanaConfig = {
-			host : 'hostname',
-			port : 30015,
-			user : 'user',
-			password : 'secret'
-			};
-			hdbext.createConnection(hanaConfig, function(error, client) {
-			if (error) {
-			return console.error(error);
-			}
-			client.exec(...);
-			});	
-*/	
+	
+	//Create DB connection with options from the bound service
+	let conn = hdbext.createConnection();
+	
+	var connParams = {
+		serverNode: hanaOptions.hana.host + ":" + hanaOptions.hana.port,
+		uid: hanaOptions.hana.user,
+		pwd: hanaOptions.hana.password,
+		CURRENTSCHEMA: hanaOptions.hana.schema
+	};
+
+	//connect
+	conn.connect(services.hana, (err) => {
+		if (err) {
+			reqStr += "ERROR: ${err.toString()}";
+			var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
+			return res.status(200).send(responseStr);
+		} else {
+			conn.exec('SELECT * FROM "LEGAL_ENTITY"', (err, result) => {
+				if (err) {
+					reqStr += "ERROR: ${err.toString()}";
+					var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
+					return res.status(200).send(responseStr);
+				} else {
+					conn.disconnect();
+					reqStr += "RESULTSET: \n\n" + stringifyObj(result, {indent: "   ",singleQuotes: false}) +  "\n\n";
+					var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
+					return res.status(200).send(responseStr);
+				}
+			});
+		}
+		return null;
+	});
+	
 	var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
 	res.status(200).send(responseStr);
 });
