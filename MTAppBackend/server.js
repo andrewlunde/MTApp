@@ -77,17 +77,14 @@ app.get("/get_legal_entity", function (req, res) {
 
 	//SELECT * FROM "LEGAL_ENTITY"
 	
-	//Create DB connection with options from the bound service
-	let conn = hdbext.createConnection();
-	
 	//connect
-	conn.connect(services.hana, (err) => {
+	hdbext.createConnection(services.hana, function(err, client) => {
 		if (err) {
 			reqStr += "ERROR: ${err.toString()}";
 			var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
 			return res.status(200).send(responseStr);
 		} else {
-			conn.exec('SELECT * FROM "LEGAL_ENTITY"', (err, result) => {
+			client.exec('SELECT * FROM "LEGAL_ENTITY"', (err, result) => {
 				if (err) {
 					reqStr += "ERROR: ${err.toString()}";
 					var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
