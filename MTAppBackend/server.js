@@ -80,13 +80,6 @@ app.get("/get_legal_entity", function (req, res) {
 	//Create DB connection with options from the bound service
 	let conn = hdbext.createConnection();
 	
-	var connParams = {
-		serverNode: hanaOptions.hana.host + ":" + hanaOptions.hana.port,
-		uid: hanaOptions.hana.user,
-		pwd: hanaOptions.hana.password,
-		CURRENTSCHEMA: hanaOptions.hana.schema
-	};
-
 	//connect
 	conn.connect(services.hana, (err) => {
 		if (err) {
