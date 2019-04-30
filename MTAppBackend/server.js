@@ -56,8 +56,12 @@ app.get("/get_legal_entity", function (req, res) {
 		singleQuotes: false
 	});
 	
+	var tagStr = "subdomain:" + req.authInfo.subdomain;
+	
+	reqStr += "\nSearching for a bound hana container with tag: " + tagStr + "\n";
+	
 	var services = xsenv.getServices({
-		hana: { tag: 'hana' }
+		hana: { tag: tagStr }
 	});
 	
 	var svcsStr = stringifyObj(services, {
