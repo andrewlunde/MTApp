@@ -24,8 +24,8 @@ app.use(bodyParser.json());
 
 // app functionality
 app.get("/", function (req, res) {
-	var reqStr = stringifyObj(req, {
-	//var reqStr = stringifyObj(req.authInfo.userInfo, {
+	//var reqStr = stringifyObj(req, {
+	var reqStr = stringifyObj(req.authInfo.userInfo, {
     indent: "   ",
     singleQuotes: false
 });
@@ -40,7 +40,7 @@ app.get("/", function (req, res) {
 	var responseStr = "";
 	responseStr += "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp</h1><h2>Welcome " + req.authInfo.userInfo.givenName + " " + req.authInfo.userInfo.familyName + "!</h2><p><b>Subdomain:</b> " + req.authInfo.subdomain + "</p><br />";
 	responseStr += "<a href=\"/get_legal_entity\">/get_legal_entity</a><br />";
-	var isAuthorized = req.authInfo.checkScope('example.scope');
+	var isAuthorized = req.authInfo.checkScope(req.authInfo.xsappname + '.create');
 	if (isAuthorized) {
 		responseStr += "<a href=\"/add_legal_entity\">/add_legal_entity</a><br />";
 	}
