@@ -92,7 +92,6 @@ app.get("/get_legal_entity", function (req, res) {
 				} else {
 					reqStr += "RESULTSET: \n\n" + stringifyObj(result, {indent: "   ",singleQuotes: false}) +  "\n\n";
 					var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
-					client.close();
 					return res.status(200).send(responseStr);
 				}
 			});
