@@ -1,0 +1,22 @@
+{
+	"format_version": 1,
+	"imports":
+	[
+        {
+            "target_table": "LEGAL_ENTITY",
+            "source_data": {
+                "data_type": "CSV",
+                "file_name": "legalentity.csv",
+                "has_header": true
+            },
+            "import_settings": {
+                "import_columns": [
+                	"LEGAL_ENTITY_ID",
+					"NAME",
+					"JURISDICTION_ID"
+                ],
+                "include_filter": []
+            }
+        }
+	]
+}

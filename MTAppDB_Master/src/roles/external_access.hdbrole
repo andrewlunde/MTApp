@@ -1,0 +1,12 @@
+{
+  "role": {
+    "name": "POC_XXX::external_access",
+    "object_privileges": [
+      {
+        "name":"JURISDICTION",
+        "type":"TABLE",
+        "privileges":[ "SELECT" ]
+      }
+    ]
+  }
+}

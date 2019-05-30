@@ -1,0 +1,8 @@
+{
+  "MASTER.JURISDICTION": {
+    "target": {
+      "object": "JURISDICTION",
+      "schema.configure"    : "POC_log-table-grantor/schema"
+    }
+  }
+}

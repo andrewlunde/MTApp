@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="le_cv" applyPrivilegeType="NONE" dataCategory="CUBE" schemaVersion="3.0" outputViewType="Projection" cacheInvalidationPeriod="NONE" enforceSqlExecution="false">
+<descriptions defaultDescription="le_cv.hdbcalculationview"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="LEGAL_ENTITY">
+    <resourceUri>LEGAL_ENTITY</resourceUri>
+  </DataSource>
+</dataSources>
+<calculationViews/>
+<logicalModel id="LEGAL_ENTITY">
+  <attributes>
+    <attribute id="LEGAL_ENTITY_ID" order="1" semanticType="empty" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Legal Entity ID">
+        <comment text=""/>
+      </descriptions>
+      <keyMapping columnObjectName="LEGAL_ENTITY" columnName="LEGAL_ENTITY_ID"/>
+    </attribute>
+    <attribute id="NAME" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Legal Entity Name"/>
+      <keyMapping columnObjectName="LEGAL_ENTITY" columnName="NAME"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="JURISDICTION_ID" order="3" aggregationType="sum" measureType="simple">
+      <descriptions defaultDescription="Legal Entity Jurisdiction"/>
+      <measureMapping columnObjectName="LEGAL_ENTITY" columnName="JURISDICTION_ID"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+  <localDimensions/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

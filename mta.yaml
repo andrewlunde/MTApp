@@ -46,6 +46,20 @@ modules:
    properties:
       TENANT_HOST_PATTERN: "^(.*)-ar.(.*)"
 
+
+ - name: db_master
+   type: hdb
+   path: MTAppDB_Master
+   requires:
+    - name: hdi_db_master
+
+
+ - name: db_client
+   type: hdb
+   path: MTAppDB_Client
+   requires:
+    - name: hdi_db_client
+
 resources:
  - name: MTAppUAA
    parameters:
@@ -54,3 +68,16 @@ resources:
       service: xsuaa
       shared: true
    type: org.cloudfoundry.managed-service
+   
+ - name: hdi_db_master
+   properties:
+      hdi-container-name: ${service-name}
+   type: com.sap.xs.hdi-container
+
+                                         
+ - name: hdi_db_client
+   properties:
+      hdi-container-name_2: ${service-name}
+   type: com.sap.xs.hdi-container
+
+                                         

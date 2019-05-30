@@ -1,0 +1,95 @@
+#!/bin/bash
+do_run=1 # Execute(evaluate) the commands
+#do_run=0 # Don't evaluate any commands
+#
+MY_DIR=$(dirname $(readlink -f $0))
+. $MY_DIR/common.sh
+#echo $?
+if [ $? -eq 1 ]; then
+  echo ""
+  echo "Copy the $MY_DIR/common.sh.template file to $MY_DIR/common.sh and adjust before continuing."
+  echo ""
+  cmd='cp '$MY_DIR/common.sh.template' '$MY_DIR/common.sh
+  echo $cmd
+  echo ""
+  cmd='vi '$MY_DIR/common.sh
+  echo $cmd
+  echo ""
+  exit
+fi
+echo ""
+echo "Including common.sh from "$MY_DIR
+echo ""
+echo "host:$host port:$port tenant:$tenant org:$org xsa_user:$xsa_user"
+xsorcf=$1
+client=$2
+version=$3
+space=$4
+echo "xsorcf:$xsorcf client:$client space:$space"
+echo ""
+#exit
+dowait=""
+doexport1=""
+doexport2=""
+if [ "$#" -eq 4 ]; then
+  if [ $xsorcf = "xs" ]; then
+    dowait=" --wait-indefinitely"
+    doexport1=" --export-json /dev/stdout 2>/dev/null | tail -n +5"
+    echo "XS cool."
+  else
+    if [ $xsorcf = "cf" ]; then
+      doexport1=" | tail -n +5 | head -n -11"
+      doexport2=" | head -n -1"
+      echo "CF cool."
+    else
+      echo "Not XS or CF, try again."
+      exit 1
+    fi
+  fi
+
+  client_uc=$(echo "$client" | tr a-z A-Z)
+  client_lc=$(echo "$client" | tr A-Z a-z)
+
+  version_uc=$(echo "$version" | tr a-z A-Z)
+  version_lc=$(echo "$version" | tr A-Z a-z)
+
+  echo Environment of Client $client_uc in Org: $org Space: $space with Version: $version_uc Starting...
+  echo ""
+
+  cmd=$xsorcf' target -o '$org' -s '$space
+  echo $cmd
+  eval $cmd
+
+  cmd=$xsorcf' service '$client_uc'_'$version_uc
+  echo $cmd
+  if [ $do_run -eq 1 ]; then eval $cmd; fi
+  RESULT=$?
+
+  echo 'HDI SERVICE RESULT:'$RESULT
+
+  echo ""
+
+  cmd='HDI_SCHEMA=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.schema'"'"$doexport2')'
+  #echo $cmd
+  if [ $do_run -eq 1 ]; then eval $cmd; fi
+  echo 'export HDI_SCHEMA='$HDI_SCHEMA
+
+  cmd='HDI_USER=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.user'"'"$doexport2')'
+  #echo $cmd
+  if [ $do_run -eq 1 ]; then eval $cmd; fi
+  echo 'export HDI_USER='$HDI_USER
+
+  cmd='HDI_PASS=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.password'"'"$doexport2')'
+  #echo $cmd
+  if [ $do_run -eq 1 ]; then eval $cmd; fi
+  echo 'export HDI_PASS='$HDI_PASS
+
+  #exit 1
+
+else
+    echo "Usage ./env client xs[cf] client version tospace"
+    exit 1
+fi
+echo ""
+echo Environment of Client $client Finished
+echo ""

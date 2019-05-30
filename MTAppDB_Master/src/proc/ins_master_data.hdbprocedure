@@ -1,0 +1,15 @@
+PROCEDURE "proc::ins_master_data"( 
+	in in_justiction_name nvarchar(32),
+	in in_justiction_code nvarchar(32),
+	out ex_message NVARCHAR(255))
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   --DEFAULT SCHEMA <default_schema_name>
+   AS
+BEGIN
+	INSERT INTO "JURISDICTION" VALUES(
+		:in_justiction_name,
+		:in_justiction_code
+	);
+	ex_message = :in_justiction_name || ' row inserted into JURISDICTION with code '  || :in_justiction_code || '.';
+END

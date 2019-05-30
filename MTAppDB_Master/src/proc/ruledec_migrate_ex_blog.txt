@@ -1,0 +1,8 @@
+// Original Blog Post for a simple Example
+
+https://blogs.sap.com/2013/10/17/step-by-step-guide-to-model-simple-decision-table/
+
+// Docs for Migration function in XSC to XSA
+
+https://help.sap.com/viewer/fc5ace7a367c434190a8047881f92ed8/2.0.03/en-US/f37f2c59967e4b56a8d6da7a0b64e7f5.html
+

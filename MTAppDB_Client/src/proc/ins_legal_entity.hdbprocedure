@@ -1,0 +1,16 @@
+PROCEDURE "ins_legal_entity"( 
+	in in_entity_name nvarchar(32),
+	in in_justiction integer,
+	out ex_message NVARCHAR(255) )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   --DEFAULT SCHEMA <default_schema_name>
+   AS
+BEGIN
+	INSERT INTO "LEGAL_ENTITY" VALUES(
+		"legalentityId".NEXTVAL,
+		:in_entity_name,
+		:in_justiction
+	);
+	ex_message = :in_entity_name || ' row inserted into LEGAL_ENTITY with jurisdiction '  || :in_justiction || '.';
+END
