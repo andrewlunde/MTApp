@@ -52,6 +52,9 @@ if [ "$#" -eq 4 ]; then
 
   version_uc=$(echo "$version" | tr a-z A-Z)
   version_lc=$(echo "$version" | tr A-Z a-z)
+  
+  space_uc=$(echo "$space" | tr a-z A-Z)
+  space_lc=$(echo "$space" | tr A-Z a-z)
 
   echo Adding Client $client_uc into Org: $org Space: $space with Version: $version_uc Starting...
   echo ""
@@ -118,7 +121,7 @@ if [ "$#" -eq 4 ]; then
   service='hana'
   plan='hdi-shared'
 
-  cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space'"}'"'"''
+  cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space_uc'"}'"'"''
   echo "====="
   echo $cmd
   echo "====="
@@ -128,7 +131,7 @@ if [ "$#" -eq 4 ]; then
   echo 'RESULT:'$RESULT
 
   if [ $RESULT -ne 0 ]; then
-    cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space'"}'"'"''
+    cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space_uc'"}'"'"''
     echo "====="
     echo $cmd
     echo "====="
@@ -210,6 +213,18 @@ if [ "$#" -eq 4 ]; then
   echo 'RESULT:'$RESULT
 
   #exit 1
+
+#xs bind-service MTAppBackend CLIENT_V0
+
+  cmd=$xsorcf' bind-service MTAppBackend '$client_uc'_'$version_uc
+  echo "====="
+  echo $cmd
+  echo "====="
+  if [ $do_run -eq 1 ]; then eval $cmd; fi
+  RESULT=$?
+
+  echo 'RESULT:'$RESULT
+
 
 #xs set-env blackz_db_v0 TARGET_CONTAINER BLACKZ_V0
 

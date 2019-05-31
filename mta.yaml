@@ -17,6 +17,7 @@ modules:
       host: prov-multi-be
     requires:
       - name: MTAppUAA
+      - name: hdi_db_client
     properties:
       SAP_JWT_TRUST_ACL:
         - clientid: '*'
