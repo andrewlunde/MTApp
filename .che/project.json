@@ -1,1 +1,1 @@
-{"type":"mta","builders":{"default":"mtabuilder","configs":{}},"runners":{"configs":{}},"attributes":{"sap.watt.common.setting":["{\"hdbInactiveFiles\":{\"inactiveFileList\":[\"/MTApp/MTAppDB_Client/src/roles/mtapp_admin.hdbrole\",\"/MTApp/MTAppDB_Client/src/defaults/default_access_role.hdbrole\"]}}"]},"description":"","mixinTypes":[]}
+{"type":"mta","builders":{"default":"mtabuilder","configs":{}},"runners":{"configs":{}},"attributes":{"sap.watt.common.setting":["{\"hdbInactiveFiles\":{\"inactiveFileList\":[]}}"]},"description":"","mixinTypes":[]}

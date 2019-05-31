@@ -1,6 +1,6 @@
 {
 	"role":{
-		"name": "mtap_client_admin",
+		"name": "mtapp_client_admin",
 		"schema_privileges": [{
 		   "privileges": ["SELECT METADATA",
 		    			  "SELECT CDS METADATA",
