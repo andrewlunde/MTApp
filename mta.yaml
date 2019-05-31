@@ -50,15 +50,33 @@ modules:
  - name: db_master
    type: hdb
    path: MTAppDB_Master
+   parameters:
+     app-name: master_db_v0
+     memory: 256M
+     disk-quota: 256M
    requires:
     - name: hdi_db_master
+      properties:
+        TARGET_CONTAINER: '~{hdi-master-container}'
 
 
  - name: db_client
    type: hdb
    path: MTAppDB_Client
+   parameters:
+     app-name: client_db_v0
+     memory: 256M
+     disk-quota: 256M
    requires:
     - name: hdi_db_client
+      properties:
+        TARGET_CONTAINER: '~{hdi-client-container}'
+    - name: dt_poc-hdi_master
+    - name: POC_XXX-table-grantor
+      group: SERVICE_REPLACEMENTS
+      properties:
+        key: POC_log-table-grantor
+        service: '~{POC_MAST-table-grantor-service}'
 
 resources:
  - name: MTAppUAA
@@ -70,14 +88,29 @@ resources:
    type: org.cloudfoundry.managed-service
    
  - name: hdi_db_master
+   parameters:
+     service-name: MASTER_V0
+     config:
+       schema: MASTER_V0_DEV
    properties:
-      hdi-container-name: ${service-name}
+      hdi-master-container: ${service-name}
    type: com.sap.xs.hdi-container
 
                                          
  - name: hdi_db_client
+   parameters:
+     service-name: CLIENT_V0
+     config:
+       schema: CLIENT_V0_DEV
    properties:
-      hdi-container-name_2: ${service-name}
+      hdi-client-container: ${service-name}
    type: com.sap.xs.hdi-container
+
+ - name: POC_XXX-table-grantor
+   type: org.cloudfoundry.existing-service
+   properties:
+     POC_MAST-table-grantor-service: '${service-name}'
+   parameters:
+     service-name: MASTER_V0
 
                                          
