@@ -25,20 +25,22 @@ xsorcf=$1
 client=$2
 version=$3
 space=$4
+subdomain=$5
 echo "xsorcf:$xsorcf client:$client space:$space"
 echo ""
 #exit
 dowait=""
 doexport1=""
 doexport2=""
-if [ "$#" -eq 4 ]; then
+if [ "$#" -eq 5 ]; then
   if [ $xsorcf = "xs" ]; then
     dowait=" --wait-indefinitely"
     doexport1=" --export-json /dev/stdout 2>/dev/null | tail -n +5"
     echo "XS cool."
   else
     if [ $xsorcf = "cf" ]; then
-      doexport1=" | tail -n +5 | head -n -8"
+      #doexport1=" | tail -n +5 | head -n -8"
+      doexport1=" | tail -n +5 | head -n -11"
       doexport2=" | head -n -1"
       echo "CF cool."
     else
@@ -53,7 +55,10 @@ if [ "$#" -eq 4 ]; then
   version_uc=$(echo "$version" | tr a-z A-Z)
   version_lc=$(echo "$version" | tr A-Z a-z)
 
-  echo Adding Client $client_uc into Org: $org Space: $space with Version: $version_uc Starting...
+  space_uc=$(echo "$space" | tr a-z A-Z)
+  space_lc=$(echo "$space" | tr A-Z a-z)
+
+  echo Adding Client $client_uc into Org: $org Space: $space with Version: $version_uc for Subdomain: $subdomain Starting...
   echo ""
   cmd='npm config set @sap:registry "https://npm.sap.com/" ; npm config set registry "https://registry.npmjs.org/" ; npm config set strict-ssl true'
   echo $cmd
@@ -103,8 +108,13 @@ if [ "$#" -eq 4 ]; then
 
 #xs push blackz_db_v0 -p db_client/ -m 256M -k 256M --no-route --no-start
 #find . -name '.vfs' -exec rm -rf {} \;
-
-  cmd=$xsorcf' push '$client_lc'_db_'$version_lc' -p db_client/ -m 256M -k 256M --no-route --no-start'
+# --health-check-type none
+  if [ $xsorcf = "cf" ]; then
+    cmd=$xsorcf' push '$client_lc'_db_'$version_lc' -p MTAppDB_Client/ -m 256M -k 256M --no-route --no-start --health-check-type none'
+  else
+    cmd=$xsorcf' push '$client_lc'_db_'$version_lc' -p MTAppDB_Client/ -m 256M -k 256M --no-route --no-start'
+  fi
+ 
   echo "====="
   echo $cmd
   echo "====="
@@ -118,7 +128,7 @@ if [ "$#" -eq 4 ]; then
   service='hana'
   plan='hdi-shared'
 
-  cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space'"}'"'"''
+  cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t subdomain:'$subdomain' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space_uc'"}'"'"''
   echo "====="
   echo $cmd
   echo "====="
@@ -128,7 +138,7 @@ if [ "$#" -eq 4 ]; then
   echo 'RESULT:'$RESULT
 
   if [ $RESULT -ne 0 ]; then
-    cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space'"}'"'"''
+    cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t subdomain:'$subdomain' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space_uc'"}'"'"''
     echo "====="
     echo $cmd
     echo "====="
@@ -211,6 +221,18 @@ if [ "$#" -eq 4 ]; then
 
   #exit 1
 
+#xs bind-service MTAppBackend ALPHA_V0
+
+  cmd=$xsorcf' bind-service MTAppBackend '$client_uc'_'$version_uc
+  echo "====="
+  echo $cmd
+  echo "====="
+  if [ $do_run -eq 1 ]; then eval $cmd; fi
+  RESULT=$?
+
+  echo 'RESULT:'$RESULT
+
+#
 #xs set-env blackz_db_v0 TARGET_CONTAINER BLACKZ_V0
 
   cmd=$xsorcf' set-env '$client_lc'_db_'$version_lc' TARGET_CONTAINER '$client_uc'_'$version_uc
@@ -299,35 +321,67 @@ if [ "$#" -eq 4 ]; then
 
   #exit 1
 
+#cf restage MTAppBackend
+
+  cmd=$xsorcf' restage MTAppBackend'
+  echo "====="
+  echo $cmd
+  echo "====="
+  if [ $do_run -eq 1 ]; then eval $cmd; fi
+  RESULT=$?
+
+  echo 'RESULT:'$RESULT
+
+  #exit 1
+
   echo ""
 
+#tail -n +5 | head -n -8 | head -n -3 | jq -r '.VCAP_SERVICES.hana[]? | select(.instance_name == "ALPHA_V0")'
+
+#      doexport1=" | tail -n +5 | head -n -8"
+#      doexport2=" | head -n -1"
+
   echo "-----------------------------------------------------"
-  cmd='HDI_SCHEMA=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.schema'"'"$doexport2')'
+  #cmd='HDI_SCHEMA=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.schema'"'"$doexport2')'
+#  cmd='HDI_SCHEMA=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | head -n -3 | jq -r '"'"'.VCAP_SERVICES.hana[]? | select(.instance_name == "'$client_uc'_'$version_uc'").credentials.schema'"'"')'
+  cmd='HDI_SCHEMA=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[]? | select(.instance_name == "'$client_uc'_'$version_uc'").credentials.schema'"'"')'
   #echo $cmd
   if [ $do_run -eq 1 ]; then eval $cmd; fi
+  #eval $cmd
   echo 'export HDI_SCHEMA='$HDI_SCHEMA
 
-  cmd='HDI_USER=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.user'"'"$doexport2')'
+  #cmd='HDI_USER=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.user'"'"$doexport2')'
+  cmd='HDI_USER=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[]? | select(.instance_name == "'$client_uc'_'$version_uc'").credentials.user'"'"')'
   #echo $cmd
   if [ $do_run -eq 1 ]; then eval $cmd; fi
+  #eval $cmd
   echo 'export HDI_USER='$HDI_USER
 
-  cmd='HDI_PASS=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.password'"'"$doexport2')'
+  #cmd='HDI_PASS=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.password'"'"$doexport2')'
+  cmd='HDI_PASS=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[]? | select(.instance_name == "'$client_uc'_'$version_uc'").credentials.password'"'"')'
   #echo $cmd
   if [ $do_run -eq 1 ]; then eval $cmd; fi
+  #eval $cmd
   echo 'export HDI_PASS='$HDI_PASS
   echo "-----------------------------------------------------"
 
   #exit 1
 
-  cmd='hdbsql -i '$inst' -n '$host':'$port' -d '$tenant' -u '$HDI_USER' -p '$HDI_PASS' '"'"'CALL "'$HDI_SCHEMA'"."ins_legal_entity"(IN_ENTITY_NAME => '"'"'"'"'"'"'"'"''$client''"'"'"'"'"'"'"'"',IN_JUSTICTION => 1,EX_MESSAGE => ?)'"'"''
+# hdbsql -n zeus.hana.prod.us-east-1.whitney.dbaas.ondemand.com:20674 -e -ssltrustcert -u ALPHA_V0_DEV_AK4NQ7GC8I9TNUFZKWNRJ5ERI_RT -p Gd7iHURZvo31gVV4kRvnJUUX98mRuQu0dWY97vxdBlOto8mKSSjotzrv2qLbj53PPm3KiN1NgdSPerDxFoY.95itMYNRunxaR5G4tzVemPT3bZ7gdPh4jomHI8tedO9N 'CALL "ALPHA_V0_DEV"."ins_legal_entity"(IN_ENTITY_NAME => '"'"'alpha'"'"',IN_JUSTICTION => 1,EX_MESSAGE => ?)'
+
+  if [ $xsorcf = "cf" ]; then
+    cmd='hdbsql -n '$host':'$port' -e -ssltrustcert -u '$HDI_USER' -p '$HDI_PASS' '"'"'CALL "'$HDI_SCHEMA'"."ins_legal_entity"(IN_ENTITY_NAME => '"'"'"'"'"'"'"'"''$client''"'"'"'"'"'"'"'"',IN_JUSTICTION => 1,EX_MESSAGE => ?)'"'"''
+  else
+    cmd='hdbsql -i '$inst' -n '$host':'$port' -d '$tenant' -u '$HDI_USER' -p '$HDI_PASS' '"'"'CALL "'$HDI_SCHEMA'"."ins_legal_entity"(IN_ENTITY_NAME => '"'"'"'"'"'"'"'"''$client''"'"'"'"'"'"'"'"',IN_JUSTICTION => 1,EX_MESSAGE => ?)'"'"''
+  fi
+
   echo "====="
   echo $cmd
   echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   
 else
-    echo "Usage ./add_client xs[cf] client version tospace"
+    echo "Usage ./add_client xs[cf] client version tospace subdomain"
     exit 1
 fi
 echo ""

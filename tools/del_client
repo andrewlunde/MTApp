@@ -99,6 +99,15 @@ if [ "$#" -eq 4 ]; then
   service='hana'
   plan='hdi-shared'
 
+#xs us MTAppBackend ALPHA_V0
+
+  cmd=$xsorcf' us MTAppBackend '$client_uc'_'$version_uc
+  echo $cmd
+  if [ $do_run -eq 1 ]; then eval $cmd; fi
+  RESULT=$?
+
+  echo 'RESULT:'$RESULT
+
 #xs us beta_db_v0 MASTER_V0
 
   cmd=$xsorcf' us '$client_lc'_db_'$version_lc' MASTER_'$version_uc
@@ -137,6 +146,50 @@ if [ "$#" -eq 4 ]; then
   echo 'RESULT:'$RESULT
 
   #exit 1
+
+  if [ $xsorcf = "xs" ]; then
+    cmd=$xsorcf' service '$client_uc'_'$version_uc
+    echo $cmd
+    if [ $do_run -eq 1 ]; then eval $cmd; fi
+    RESULT=$?
+    #echo 'RESULT:'$RESULT
+  else
+    # Handle CF deletion of services a bit differently
+    # cf services | grep dat368-hdi | grep "create succeeded"
+    cmd=$xsorcf' services | grep '$client_uc'_'$version_uc' | grep "delete in progress"'
+    echo "====="
+    echo $cmd
+    echo "====="
+    if [ $do_run -eq 1 ]; then eval $cmd; fi
+    RESULT=$?
+    #echo 'RESULT:'$RESULT
+  fi
+
+  # Service deletion is NOT guarenteed to happen right away
+  # Might want to add a timeout counter...
+  while [ $RESULT -eq 0 ]; do
+    echo "Sleeping for 10secs..."
+    sleep 10
+
+    if [ $xsorcf = "xs" ]; then
+      cmd=$xsorcf' service '$client_uc'_'$version_uc
+      echo "====="
+      echo $cmd
+      echo "====="
+      if [ $do_run -eq 1 ]; then eval $cmd; fi
+      RESULT=$?
+      #echo 'RESULT:'$RESULT
+    else
+      # Handle CF deletion of services a bit differently
+      # cf services | grep dat368-hdi | grep "create succeeded"
+      cmd=$xsorcf' services | grep '$client_uc'_'$version_uc' | grep "delete in progress"'
+      echo $cmd
+      if [ $do_run -eq 1 ]; then eval $cmd; fi
+      RESULT=$?
+      #echo 'RESULT:'$RESULT
+    fi
+  done 
+
 
   echo ""
 
