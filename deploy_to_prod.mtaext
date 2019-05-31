@@ -1,0 +1,25 @@
+_schema-version: '3.1'
+ID: dt_poc-mtaex
+extends: dt_poc
+
+modules:
+ - name: dt_poc-db_master
+   parameters:
+     app-name: master_db_v0
+     
+ - name: dt_poc-db_client
+   parameters:
+     app-name: client_db_v0
+     
+resources:
+ - name: dt_poc-hdi_master
+   parameters:
+     service-name: MASTER_V0
+     config:
+       schema: MASTER_V0_PROD
+      
+ - name: dt_poc-hdi_client
+   parameters:
+     service-name: CLIENT_V0
+     config:
+       schema: DEMO_V0_PROD
