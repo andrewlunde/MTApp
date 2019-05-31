@@ -15,3 +15,7 @@ mergedManifestDescriptor.json
 APIExternalProducer.js
 .*/APIExternalProducer.js
 .DS_Store
+.mta/
+package-lock.json
+node_modules
+target/
