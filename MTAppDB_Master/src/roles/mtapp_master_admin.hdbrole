@@ -1,6 +1,6 @@
 {
 	"role":{
-		"name": "dt_poc_admin",
+		"name": "mtapp_master_admin",
 		"schema_privileges": [{
 		   "privileges": ["SELECT METADATA",
 		    			  "SELECT CDS METADATA",

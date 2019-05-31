@@ -2,10 +2,16 @@
 <projectDescription>
 	<name>MTApp_proj</name>
 	<comment>Multi-Target Application for Multi-Tenant concepts.</comment>
-        <projects>
-        </projects>
-        <buildSpec>
-        </buildSpec>
-        <natures>
-        </natures>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.xtext.ui.shared.xtextBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
+	</natures>
 </projectDescription>
