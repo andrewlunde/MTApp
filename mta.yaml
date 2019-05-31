@@ -1,41 +1,39 @@
 ID: MTApp
 _schema-version: '2.1'
-description: Multitenant Business App based on Node.js
+description: Multitenant Business App based on Node.js.
 version: 0.0.1
-
 modules:
- - name: MTAppBackend
-   type: nodejs
-   path: MTAppBackend
-   provides:
-    - name: MTAppBackend_api
-      properties:
-         beurl: ${default-url}
-   parameters:
+  - name: MTAppBackend
+    type: nodejs
+    path: MTAppBackend
+    provides:
+      - name: MTAppBackend_api
+        properties:
+          beurl: '${default-url}'
+    parameters:
       app-name: MTAppBackend
       disk-quota: 256M
       memory: 256M
       host: prov-multi-be
-   requires:
+    requires:
       - name: MTAppUAA
-   properties:
+    properties:
       SAP_JWT_TRUST_ACL:
-        - clientid: "*"
-          identityzone: "sap-provisioning"
-
- - name: MTAppRouter
-   type: nodejs
-   path: MTAppRouter
-   provides:
-    - name: MTAppRouter_api
-      properties:
-         url: ${default-url}
-   parameters:
+        - clientid: '*'
+          identityzone: sap-provisioning
+  - name: MTAppRouter
+    type: nodejs
+    path: MTAppRouter
+    provides:
+      - name: MTAppRouter_api
+        properties:
+          url: '${default-url}'
+    parameters:
       app-name: MTAppRouter
       disk-quota: 256M
       memory: 256M
       host: prov-multi-ar
-   requires:
+    requires:
       - name: MTAppUAA
       - name: MTAppBackend_api
         group: destinations
@@ -43,74 +41,63 @@ modules:
           name: MTAppBackend_api
           url: '~{beurl}'
           forwardAuthToken: true
-   properties:
-      TENANT_HOST_PATTERN: "^(.*)-ar.(.*)"
-
-
- - name: db_master
-   type: hdb
-   path: MTAppDB_Master
-   parameters:
-     app-name: master_db_v0
-     memory: 256M
-     disk-quota: 256M
-   requires:
-    - name: hdi_db_master
-      properties:
-        TARGET_CONTAINER: '~{hdi-master-container}'
-
-
- - name: db_client
-   type: hdb
-   path: MTAppDB_Client
-   parameters:
-     app-name: client_db_v0
-     memory: 256M
-     disk-quota: 256M
-   requires:
-    - name: hdi_db_client
-      properties:
-        TARGET_CONTAINER: '~{hdi-client-container}'
-    - name: dt_poc-hdi_master
-    - name: POC_XXX-table-grantor
-      group: SERVICE_REPLACEMENTS
-      properties:
-        key: POC_log-table-grantor
-        service: '~{POC_MAST-table-grantor-service}'
-
+    properties:
+      TENANT_HOST_PATTERN: '^(.*)-ar.(.*)'
+  - name: db_master
+    type: hdb
+    path: MTAppDB_Master
+    parameters:
+      app-name: master_db_v0
+      memory: 256M
+      disk-quota: 256M
+    requires:
+      - name: hdi_db_master
+        properties:
+          TARGET_CONTAINER: '~{hdi-master-container}'
+  - name: db_client
+    type: hdb
+    path: MTAppDB_Client
+    parameters:
+      app-name: client_db_v0
+      memory: 256M
+      disk-quota: 256M
+    requires:
+      - name: hdi_db_client
+        properties:
+          TARGET_CONTAINER: '~{hdi-client-container}'
+      - name: dt_poc-hdi_master
+      - name: POC_XXX-table-grantor
+        group: SERVICE_REPLACEMENTS
+        properties:
+          key: POC_log-table-grantor
+          service: '~{POC_MAST-table-grantor-service}'
 resources:
- - name: MTAppUAA
-   parameters:
+  - name: MTAppUAA
+    parameters:
       path: ./xs-security.json
       service-plan: application
       service: xsuaa
       shared: true
-   type: org.cloudfoundry.managed-service
-   
- - name: hdi_db_master
-   parameters:
-     service-name: MASTER_V0
-     config:
-       schema: MASTER_V0_DEV
-   properties:
-      hdi-master-container: ${service-name}
-   type: com.sap.xs.hdi-container
-
-                                         
- - name: hdi_db_client
-   parameters:
-     service-name: CLIENT_V0
-     config:
-       schema: CLIENT_V0_DEV
-   properties:
-      hdi-client-container: ${service-name}
-   type: com.sap.xs.hdi-container
-
- - name: POC_XXX-table-grantor
-   type: org.cloudfoundry.existing-service
-   properties:
-     POC_MAST-table-grantor-service: '${service-name}'
-   parameters:
-     service-name: MASTER_V0
-
-                                         
+    type: org.cloudfoundry.managed-service
+  - name: hdi_db_master
+    parameters:
+      service-name: MASTER_V0
+      config:
+        schema: MASTER_V0_DEV
+    properties:
+      hdi-master-container: '${service-name}'
+    type: com.sap.xs.hdi-container
+  - name: hdi_db_client
+    parameters:
+      service-name: CLIENT_V0
+      config:
+        schema: CLIENT_V0_DEV
+    properties:
+      hdi-client-container: '${service-name}'
+    type: com.sap.xs.hdi-container
+  - name: POC_XXX-table-grantor
+    type: org.cloudfoundry.existing-service
+    properties:
+      POC_MAST-table-grantor-service: '${service-name}'
+    parameters:
+      service-name: MASTER_V0
