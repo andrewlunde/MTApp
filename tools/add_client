@@ -74,15 +74,21 @@ if [ "$#" -eq 4 ]; then
 
   if [ $RESULT -ne 0 ]; then
     cmd=$xsorcf' create-space '$space' -o '$org
+    echo "====="
     echo $cmd
+    echo "====="
     if [ $do_run -eq 1 ]; then eval $cmd; fi
 
     cmd=$xsorcf' set-space-role XSA_ADMIN,'$xsa_user' '$org' '$space' SpaceDeveloper'
+    echo "====="
     echo $cmd
+    echo "====="
     if [ $do_run -eq 1 ]; then eval $cmd; fi
 
     cmd=$xsorcf' map-tenant-database '$tenant' -o '$org' -s '$space
+    echo "====="
     echo $cmd
+    echo "====="
     if [ $do_run -eq 1 ]; then eval $cmd; fi
 
     cmd='echo "Deploy First!"'
@@ -90,14 +96,18 @@ if [ "$#" -eq 4 ]; then
   fi
 
   cmd=$xsorcf' target -o '$org' -s '$space
+  echo "====="
   echo $cmd
+  echo "====="
   eval $cmd
 
 #xs push blackz_db_v0 -p db_client/ -m 256M -k 256M --no-route --no-start
 #find . -name '.vfs' -exec rm -rf {} \;
 
   cmd=$xsorcf' push '$client_lc'_db_'$version_lc' -p db_client/ -m 256M -k 256M --no-route --no-start'
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
@@ -108,21 +118,27 @@ if [ "$#" -eq 4 ]; then
   service='hana'
   plan='hdi-shared'
 
-  cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc
+  cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space'"}'"'"''
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
   echo 'RESULT:'$RESULT
 
   if [ $RESULT -ne 0 ]; then
-    cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc
+    cmd=$xsorcf' create-service '$service' '$plan' '$client_uc'_'$version_uc' -t '$client_lc'_'$version_lc' -c '"'"'{"schema": "'$client_uc'_'$version_uc'_'$space'"}'"'"''
+    echo "====="
     echo $cmd
+    echo "====="
     if [ $do_run -eq 1 ]; then eval $cmd; fi
   fi
   
   cmd=$xsorcf' service '$client_uc'_'$version_uc
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
@@ -138,7 +154,9 @@ if [ "$#" -eq 4 ]; then
     # Handle CF creation of services a bit differently
     # cf services | grep dat368-hdi | grep "create succeeded"
     cmd=$xsorcf' services | grep '$client_uc'_'$version_uc' | grep "create succeeded"'
+    echo "====="
     echo $cmd
+    echo "====="
     if [ $do_run -eq 1 ]; then eval $cmd; fi
     RESULT=$?
     #echo 'RESULT:'$RESULT
@@ -152,7 +170,9 @@ if [ "$#" -eq 4 ]; then
 
     if [ $xsorcf = "xs" ]; then
       cmd=$xsorcf' service '$client_uc'_'$version_uc
+      echo "====="
       echo $cmd
+      echo "====="
       if [ $do_run -eq 1 ]; then eval $cmd; fi
       RESULT=$?
       #echo 'RESULT:'$RESULT
@@ -170,7 +190,9 @@ if [ "$#" -eq 4 ]; then
 #xs bind-service blackz_db_v0 BLACKZ_V0
 
   cmd=$xsorcf' bind-service '$client_lc'_db_'$version_lc' '$client_uc'_'$version_uc
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
@@ -179,7 +201,9 @@ if [ "$#" -eq 4 ]; then
 #xs bs blackz_db_v0 MASTER_V0
 
   cmd=$xsorcf' bind-service '$client_lc'_db_'$version_lc' MASTER_'$version_uc
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
@@ -190,7 +214,9 @@ if [ "$#" -eq 4 ]; then
 #xs set-env blackz_db_v0 TARGET_CONTAINER BLACKZ_V0
 
   cmd=$xsorcf' set-env '$client_lc'_db_'$version_lc' TARGET_CONTAINER '$client_uc'_'$version_uc
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
@@ -202,7 +228,9 @@ if [ "$#" -eq 4 ]; then
 # '  '"'"'
 
   cmd=$xsorcf' set-env '$client_lc'_db_'$version_lc' SERVICE_REPLACEMENTS '"'"'[{"key":"POC_log-table-grantor","service": "MASTER_V0"}]'"'"
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
@@ -213,7 +241,9 @@ if [ "$#" -eq 4 ]; then
 #xs restart blackz_db_v0
 
   cmd=$xsorcf' restart '$client_lc'_db_'$version_lc
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
@@ -235,7 +265,9 @@ if [ "$#" -eq 4 ]; then
 #xs logs blackz_db_v0 --recent | grep "Application can be stopped."
 
   cmd=$xsorcf' logs '$client_lc'_db_'$version_lc' --recent | grep "Application can be stopped."'
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
@@ -257,7 +289,9 @@ if [ "$#" -eq 4 ]; then
 #xs stop blackz_db_v0
 
   cmd=$xsorcf' stop '$client_lc'_db_'$version_lc
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   RESULT=$?
 
@@ -267,6 +301,7 @@ if [ "$#" -eq 4 ]; then
 
   echo ""
 
+  echo "-----------------------------------------------------"
   cmd='HDI_SCHEMA=$('$xsorcf' env '$client_lc'_db_'$version_lc' '$doexport1' | jq -r '"'"'.VCAP_SERVICES.hana[0].credentials.schema'"'"$doexport2')'
   #echo $cmd
   if [ $do_run -eq 1 ]; then eval $cmd; fi
@@ -281,12 +316,14 @@ if [ "$#" -eq 4 ]; then
   #echo $cmd
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   echo 'export HDI_PASS='$HDI_PASS
+  echo "-----------------------------------------------------"
 
   #exit 1
 
-#  cmd='hdbsql -i '$inst' -n '$host':'$port' -d '$tenant' -u '$HDI_USER' -p '$HDI_PASS' '"'"'CALL "proc::ins_client_data"(IN_CLIENTNAME => '"'"'apollo'"'"'/*<NVARCHAR(32)>*/,EX_MESSAGE => ?)'
   cmd='hdbsql -i '$inst' -n '$host':'$port' -d '$tenant' -u '$HDI_USER' -p '$HDI_PASS' '"'"'CALL "'$HDI_SCHEMA'"."ins_legal_entity"(IN_ENTITY_NAME => '"'"'"'"'"'"'"'"''$client''"'"'"'"'"'"'"'"',IN_JUSTICTION => 1,EX_MESSAGE => ?)'"'"''
+  echo "====="
   echo $cmd
+  echo "====="
   if [ $do_run -eq 1 ]; then eval $cmd; fi
   
 else
