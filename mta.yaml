@@ -41,36 +41,41 @@ modules:
           name: MTAppBackend_api
           url: '~{beurl}'
           forwardAuthToken: true
-    properties:
-      TENANT_HOST_PATTERN: '^(.*)-ar.(.*)'
-  - name: db_master
-    type: hdb
-    path: MTAppDB_Master
-    parameters:
-      app-name: master_db_v0
-      memory: 256M
-      disk-quota: 256M
-    requires:
-      - name: hdi_db_master
-        properties:
-          TARGET_CONTAINER: '~{hdi-master-container}'
-  - name: db_client
-    type: hdb
-    path: MTAppDB_Client
-    parameters:
-      app-name: client_db_v0
-      memory: 256M
-      disk-quota: 256M
-    requires:
-      - name: hdi_db_client
-        properties:
-          TARGET_CONTAINER: '~{hdi-client-container}'
-      - name: dt_poc-hdi_master
-      - name: POC_XXX-table-grantor
-        group: SERVICE_REPLACEMENTS
-        properties:
-          key: POC_log-table-grantor
-          service: '~{POC_MAST-table-grantor-service}'
+   properties:
+      TENANT_HOST_PATTERN: "^(.*)-ar.(.*)"
+
+
+ - name: db_master
+   type: hdb
+   path: MTAppDB_Master
+   parameters:
+     app-name: master_db_v0
+     memory: 256M
+     disk-quota: 256M
+   requires:
+    - name: hdi_db_master
+      properties:
+        TARGET_CONTAINER: '~{hdi-master-container}'
+
+
+ - name: db_client
+   type: hdb
+   path: MTAppDB_Client
+   parameters:
+     app-name: client_db_v0
+     memory: 256M
+     disk-quota: 256M
+   requires:
+    - name: hdi_db_client
+      properties:
+        TARGET_CONTAINER: '~{hdi-client-container}'
+    - name: hdi_db_master
+    - name: POC_XXX-table-grantor
+      group: SERVICE_REPLACEMENTS
+      properties:
+        key: POC_log-table-grantor
+        service: '~{POC_MAST-table-grantor-service}'
+
 resources:
   - name: MTAppUAA
     parameters:
