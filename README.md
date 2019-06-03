@@ -4,6 +4,7 @@ Multitenant Business Applications
 
 https://www.youtube.com/playlist?list=PLkzo92owKnVx3Sh0nemX8GoSNzJGfsWJM
 
+Philip's orgininal repo is at [https://github.com/saphanaacademy/MTApp](https://github.com/saphanaacademy/MTApp)
 ```
 cf push MTAppBackend -n prov-multi-be -i 1 -k 256M -m 256M -p MTAppBackend
 ```
