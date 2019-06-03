@@ -16,3 +16,5 @@ APIExternalProducer.js
 .*/APIExternalProducer.js
 .DS_Store
 /mta_archives/
+tools/common.sh
+tmp/
