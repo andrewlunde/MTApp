@@ -323,6 +323,19 @@ if [ "$#" -eq 5 ]; then
 
 #cf restage MTAppBackend
 
+#cf map-route MTAppRouter cfapps.us10.hana.ondemand.com --hostname sub1-multi-ar
+
+  cmd=$xsorcf' map-route MTAppRouter cfapps.us10.hana.ondemand.com --hostname '$subdomain'-ar'
+  echo "====="
+  echo $cmd
+  echo "====="
+  if [ $do_run -eq 1 ]; then eval $cmd; fi
+  RESULT=$?
+
+  echo 'RESULT:'$RESULT
+
+  #exit 1
+
   cmd=$xsorcf' restage MTAppBackend'
   echo "====="
   echo $cmd

@@ -22,4 +22,9 @@ xs deploy target/mtapp-XSA.mtar -e deploy_to_prod.mtaext ; tools/add_client xs a
 Delete a client (ALPHA) then UnDeploy the project (MASTER + CLIENT)
 ```
 tools/del_client xs alpha v0 prod ; xs undeploy dt_poc --delete-services -f
+```
+Enable the default CLIENT container.
 
+```
+cf update-service CLIENT_V0 -t "subdomain:prov-multi"
+```
