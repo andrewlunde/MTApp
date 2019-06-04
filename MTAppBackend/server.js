@@ -11,6 +11,28 @@ var bodyParser = require("body-parser");
 
 var app = express();
 
+function mtMiddleware(req, res, next) {
+	
+	// Assumes the HDI container was tagged with a tag of the form subdomain:<subdomain> and is bound to the MTAppBackend
+	var tagStr = "subdomain:" + req.authInfo.subdomain;
+	
+	// reqStr += "\nSearching for a bound hana container with tag: " + tagStr + "\n";
+	
+	var services = xsenv.getServices({
+		hana: { tag: tagStr }
+	});
+	
+	// If a container service binding was found
+	req.tenantContainer = services.hana;
+	// Else throw an error?  Not handled yet
+	//.catch(function (error) {
+	//	res.status(500).send(error.message);
+	//})
+	
+	next();
+}
+
+
 passport.use("JWT", new xssec.JWTStrategy(xsenv.getServices({
 	uaa: {
 		tag: "xsuaa"
@@ -21,6 +43,8 @@ app.use(passport.authenticate("JWT", {
 	session: false
 }));
 app.use(bodyParser.json());
+
+app.use(mtMiddleware);
 
 // app functionality
 app.get("/", function (req, res) {
@@ -62,29 +86,10 @@ app.get("/get_legal_entity", function (req, res) {
 		singleQuotes: false
 	});
 	
-	var tagStr = "subdomain:" + req.authInfo.subdomain;
-	
-	reqStr += "\nSearching for a bound hana container with tag: " + tagStr + "\n";
-	
-	var services = xsenv.getServices({
-		hana: { tag: tagStr }
-	});
-	
-	var svcsStr = stringifyObj(services, {
-		indent: "   ",
-		singleQuotes: false
-	});
-
-	reqStr += "\n\n";
-
-	reqStr += svcsStr;
-	
-	reqStr += "\n\n";
-
 	//SELECT * FROM "LEGAL_ENTITY"
 	
 	//connect
-	var conn = hdbext.createConnection(services.hana, (err, client) => {
+	var conn = hdbext.createConnection(req.tenantContainer, (err, client) => {
 		if (err) {
 			reqStr += "ERROR: ${err.toString()}";
 			var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
@@ -119,47 +124,34 @@ app.get("/add_legal_entity", function (req, res) {
 		singleQuotes: false
 	});
 	
-	var tagStr = "subdomain:" + req.authInfo.subdomain;
-	
-	reqStr += "\nSearching for a bound hana container with tag: " + tagStr + "\n";
-	
-	var services = xsenv.getServices({
-		hana: { tag: tagStr }
-	});
-	
-	var svcsStr = stringifyObj(services, {
-		indent: "   ",
-		singleQuotes: false
-	});
-
-	reqStr += "\n\n";
-
-	reqStr += svcsStr;
-	
-	reqStr += "\n\n";
-
 	//INSERT INTO "LEGAL_ENTITY" VALUES("legalentityId".NEXTVAL, 'Added Entity',1 )"
 	
-	//connect
-	var conn = hdbext.createConnection(services.hana, (err, client) => {
-		if (err) {
-			reqStr += "ERROR: ${err.toString()}";
-			var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
-			return res.status(200).send(responseStr);
-		} else {
-			client.exec('INSERT INTO "LEGAL_ENTITY" VALUES("legalentityId".NEXTVAL, \'Added Entity\',1 )', (err, result) => {
-				if (err) {
-					reqStr += "ERROR: ${err.toString()}";
-					var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
-					return res.status(200).send(responseStr);
-				} else {
-					reqStr += "RESULTSET: \n\n" + stringifyObj(result, {indent: "   ",singleQuotes: false}) +  "\n\n";
-					var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
-					return res.status(200).send(responseStr);
-				}
-			});
-		}
-	});
+	var isAuthorized = req.authInfo.checkScope(req.authInfo.xsappname + '.create');
+	if (isAuthorized) {
+		//connect
+		var conn = hdbext.createConnection(req.tenantContainer, (err, client) => {
+			if (err) {
+				reqStr += "ERROR: ${err.toString()}";
+				var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
+				return res.status(200).send(responseStr);
+			} else {
+				client.exec('INSERT INTO "LEGAL_ENTITY" VALUES("legalentityId".NEXTVAL, \'Added Entity\',1 )', (err, result) => {
+					if (err) {
+						reqStr += "ERROR: ${err.toString()}";
+						var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
+						return res.status(200).send(responseStr);
+					} else {
+						reqStr += "RESULTSET: \n\n" + stringifyObj(result, {indent: "   ",singleQuotes: false}) +  "\n\n";
+						var responseStr = "<!DOCTYPE HTML><html><head><title>MTApp</title></head><body><h1>MTApp Legal Entities</h1><h2>Legal Entities</h2><p><pre>" + reqStr + "</pre>" + "<br /> <a href=\"/\">Back</a><br /></body></html>";
+						return res.status(200).send(responseStr);
+					}
+				});
+			}
+		});
+	}
+	else {
+		return res.status(401).send("Unauthorized: Your user must have the " + req.authInfo.xsappname + ".create scope to perfrom this function.");
+	}
 });
 
 
